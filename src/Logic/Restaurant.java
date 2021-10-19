@@ -1,14 +1,28 @@
 package Logic;
 
+import Logic.Menu.Menu;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
 public class Restaurant implements Serializable {
 
+    private String name;
+    private Menu menu;
     private HashMap<Integer, Table> tables;
 
-    public Restaurant(){
+    public Restaurant(String name,  Menu menu){
         this.tables = new HashMap<>();
+        this.menu = menu;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Menu getMenu() {
+        return menu;
     }
 
     public int[] getTables() {

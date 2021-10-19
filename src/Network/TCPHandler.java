@@ -6,8 +6,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class TCPHandler extends Thread{
-    private ServerSocket serverSocket;
+
     private int port;
+    private ServerSocket serverSocket;
     private boolean running;
     private boolean connected;
 

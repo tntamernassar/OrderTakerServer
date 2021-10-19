@@ -1,19 +1,22 @@
 package Network.NetworkMessages;
 
 import Logic.Waitress;
+import Network.ConnectionHandler;
 import org.json.simple.JSONObject;
 
-public class TestMessage implements NetworkMessage{
+public class TestMessage extends IncomingNetworkMessage{
+
+    public TestMessage(ConnectionHandler connectionHandler, String restaurantName){
+        super(connectionHandler, restaurantName);
+    }
 
     @Override
     public JSONObject encode() {
-        JSONObject j = new JSONObject();
-        j.put("type", "TestMessage");
-        return j;
+        return makeJSONMessage("TestMessage");
     }
 
     @Override
     public void visit(Waitress waitress) {
-        System.out.println("Visiting res");
+        System.out.println("Waitress " + waitress.getName() + " sent a Test Message !");
     }
 }

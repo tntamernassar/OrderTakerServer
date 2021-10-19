@@ -7,9 +7,9 @@ public class TryThings {
 
 
         JSONObject js = new JSONObject();
-        js.put("ts", new TestMessage());
+        js.put("ts", new TestMessage(null, "test"));
 
-        System.out.println(js.toJSONString());
+        System.out.println( "?>>>>> "+ js.toJSONString());
 
     }
 

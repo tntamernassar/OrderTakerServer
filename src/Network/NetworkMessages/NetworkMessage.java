@@ -1,14 +1,14 @@
 package Network.NetworkMessages;
-import Logic.Restaurant;
-import Logic.Waitress;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 
-public interface NetworkMessage extends Serializable {
+public abstract class NetworkMessage implements Serializable {
+    public abstract JSONObject encode();
 
-    JSONObject encode();
-
-    void visit(Waitress Waitress);
-
+    public JSONObject makeJSONMessage(String type) {
+        JSONObject j = new JSONObject();
+        j.put("type", type);
+        return j;
+    }
 }

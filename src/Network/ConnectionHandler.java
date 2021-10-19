@@ -1,31 +1,38 @@
 package Network;
 
 
-import Logic.Restaurant;
 import Logic.Waitress;
+import Network.NetworkMessages.IncomingNetworkMessage;
 import Network.NetworkMessages.NetworkMessage;
 import Network.NetworkMessages.NetworkMessageDecoder;
-import Utils.Constants;
+import Network.NetworkMessages.OutGoingNetworkMessage;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
-import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class ConnectionHandler extends Thread{
 
-    protected Socket socket;
     private Waitress waitress;
+    protected Socket socket;
     private boolean running;
 
-    public ConnectionHandler(Socket socket, Waitress waitress){
+    public ConnectionHandler(Socket socket){
         this.socket = socket;
-        this.waitress = waitress;
         this.running = true;
     }
 
+
+    public void setWaitress(Waitress waitress) {
+        this.waitress = waitress;
+    }
 
     public boolean isReachable(){
         try{
@@ -35,13 +42,11 @@ public class ConnectionHandler extends Thread{
         }
     }
 
-    public boolean send(NetworkMessage networkMessage){
+    public boolean send(OutGoingNetworkMessage networkMessage){
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(Constants.TCP_BUFFER_SIZE);
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(networkMessage.encode());
-            byte[] data = baos.toByteArray();
-            socket.getOutputStream().write(data);
+            String msg = networkMessage.encode().toString();
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            dos.writeUTF(msg);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -49,19 +54,34 @@ public class ConnectionHandler extends Thread{
         }
     }
 
+    private void onMessage(IncomingNetworkMessage message){
+        if (this.waitress == null) {
+            this.waitress = RestaurantsManager.getInstance().getWaitress(message.getSerialNumber());
+        }
+        message.visit(this.waitress);
+    }
+
     @Override
     public void run() {
         while (this.running){
             try{
-                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                JSONObject JSONMessage =  (JSONObject)ois.readObject();
-                NetworkMessage networkMessage = NetworkMessageDecoder.decode(JSONMessage);
-                networkMessage.visit(this.waitress);
+                byte[] b = socket.getInputStream().readNBytes(1);
+                int length = b[0];
+                byte[] bytes = new byte[length];
+                socket.getInputStream().read(bytes);
+                JSONParser p = new JSONParser();
+                JSONObject JSONMessage = (JSONObject) p.parse(new String(bytes, StandardCharsets.UTF_8));
+                IncomingNetworkMessage networkMessage = (IncomingNetworkMessage)NetworkMessageDecoder.decode(this, JSONMessage);
+                this.onMessage(networkMessage);
             }catch (EOFException eofException){
+                eofException.printStackTrace();
+                this.running = false;
+            }catch (SocketException socketException){
+                socketException.printStackTrace();
                 this.running = false;
             }catch (Exception e){
                 try{
-                    socket = new Socket(socket.getInetAddress(), socket.getPort());
+                    this.running = false;
                 }catch (Exception ex){
                     this.running = false;
                     continue;
