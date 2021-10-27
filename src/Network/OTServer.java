@@ -19,7 +19,7 @@ public class OTServer {
 
         RestaurantsManager.getInstance().addWaitress("John", restaurant.getName(), waitress);
 
-        TCPHandler tcpHandler = new TCPHandler(443) {
+        TCPHandler tcpHandler = new TCPHandler(2222) {
             @Override
             public void onConnectionRequest(Socket socket) {
                 System.out.println("Connection accepted");
