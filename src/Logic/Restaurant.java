@@ -25,6 +25,7 @@ public class Restaurant implements Serializable {
         return menu;
     }
 
+
     public int[] getTables() {
         int [] res = new int[tables.size()];
         int index = 0;

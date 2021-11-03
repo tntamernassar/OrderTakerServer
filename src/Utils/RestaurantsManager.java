@@ -1,4 +1,4 @@
-package Network;
+package Utils;
 
 import Logic.Waitress;
 

@@ -2,10 +2,10 @@ package Network;
 
 
 import Logic.Waitress;
-import Network.NetworkMessages.IncomingNetworkMessage;
-import Network.NetworkMessages.NetworkMessage;
+import Network.NetworkMessages.In.IncomingNetworkMessage;
 import Network.NetworkMessages.NetworkMessageDecoder;
-import Network.NetworkMessages.OutGoingNetworkMessage;
+import Network.NetworkMessages.Out.OutGoingNetworkMessage;
+import Utils.RestaurantsManager;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -14,10 +14,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class ConnectionHandler extends Thread {
 
@@ -74,13 +70,13 @@ public class ConnectionHandler extends Thread {
                 this.onMessage(networkMessage);
             }
         } catch (EOFException eofException) {
-            eofException.printStackTrace();
+            System.out.println((waitress == null ? "Tablet" : waitress.getName()) + " Closed the connection");
             this.running = false;
         } catch (SocketException socketException) {
             socketException.printStackTrace();
             this.running = false;
         } catch (Exception e) {
-            this.running = false;
+            e.printStackTrace();
         }
 
     }

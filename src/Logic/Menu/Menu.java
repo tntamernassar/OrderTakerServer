@@ -3,7 +3,6 @@ package Logic.Menu;
 
 import org.json.simple.JSONObject;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +22,13 @@ public class Menu {
 
     public void addProduct(MenuProduct product){
         this.menuProductList.add(product);
+    }
+
+    public void setMenuProductList(List<MenuProduct> menuProductList) {
+        this.menuProductList = new LinkedList<>();
+        for (MenuProduct menuProduct : menuProductList){
+            addProduct(menuProduct);
+        }
     }
 
     public JSONObject toJSON(){
