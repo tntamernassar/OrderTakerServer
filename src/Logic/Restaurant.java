@@ -1,6 +1,7 @@
 package Logic;
 
 import Logic.Menu.Menu;
+import Logic.Menu.OrderHistory;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ public class Restaurant implements Serializable {
     private String name;
     private Menu menu;
     private HashMap<Integer, Table> tables;
+    private OrderHistory orderHistory;
 
     public Restaurant(String name,  Menu menu){
         this.tables = new HashMap<>();
@@ -25,6 +27,9 @@ public class Restaurant implements Serializable {
         return menu;
     }
 
+    public OrderHistory getOrderHistory() {
+        return orderHistory;
+    }
 
     public int[] getTables() {
         int [] res = new int[tables.size()];

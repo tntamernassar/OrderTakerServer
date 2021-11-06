@@ -26,22 +26,76 @@ public class Waitress {
         return name;
     }
 
-    public void openTable(int table){}
-
-    public int orderItem(int table, Product product, int quantity, String notes){
-        return -1;
+    public void openTable(int table){
+        Table theTable = restaurant.getTable(table);
+        if (!theTable.isActive()){
+            theTable.startOrder(getName());
+            System.out.println("Opened Table " + table);
+        }else {
+        }
     }
 
-    public void removeItem(int table, int orderItem){}
+    public int orderItem(int table, Product product, int quantity, String notes) {
+        if (!this.restaurant.getTable(table).isActive()) {
+            this.restaurant.getTable(table).startOrder(getName());
+        }
+        return this.restaurant.getTable(table).getCurrentOrder().addItem(this.getName(), product, quantity, notes);
+    }
 
-    public void editOrder(int table, int orderItem, Product product, int quantity, String notes){}
+    public void removeItem(int table, int orderItem){
+        Table theTable = restaurant.getTable(table);
+        if(theTable.isActive()){
+            theTable.getCurrentOrder().removeItem(orderItem);
+        }
+    }
+
+    public void editOrder(int table, int orderItem, Product product, int quantity, String notes){
+        restaurant.getTable(table).getCurrentOrder().editOrder(orderItem, product, quantity, notes);
+    }
 
     public Order submitOrder(int table){
-        return null;
+        if(restaurant.getTable(table).isActive()){
+            Table theTable = restaurant.getTable(table);
+            Order currentOrder = theTable.getCurrentOrder();
+            if(currentOrder.getOrderItems().size() > 0){
+                currentOrder.distributeItems();
+                if(currentOrder.isDistributed()){
+                    // the order already distributed
+                    currentOrder.setDistributeVersion(currentOrder.clone());
+                    System.out.println("Table " + table + " ReSubmitted an order");
+                }else{
+                    // this is the first order from this table
+                    currentOrder.setDistributed(true);
+                    currentOrder.setDistributeVersion(currentOrder.clone());
+                    System.out.println("Table " + table + " Submitted the order");
+                }
+                return currentOrder;
+            }else{
+                System.out.println("Order contains no item");
+                return null;
+            }
+        }else{
+            System.out.println("Table " + table + " Tried to submit a closed table !");
+            return null;
+        }
     }
 
     public Order closeOrder(int table){
-        return null;
+        Table theTable = restaurant.getTable(table);
+        if(theTable.isActive()){
+            if(theTable.getCurrentOrder().getOrderItems().size() > 0){
+                boolean added = this.restaurant.getOrderHistory().addToHistory(table, theTable.getCurrentOrder());
+                if(added) {
+//                    this.restaurant.getOrderHistory().write();
+                }
+            }
+            Order closedOrder = theTable.closeOrder();
+            System.out.println("Table " + table + " Closed the order");
+            return closedOrder;
+        }else{
+            System.out.println("Table " + table + " Tried to close a closed table");
+            return null;
+        }
     }
 
     public Order cancelOrder(int table){

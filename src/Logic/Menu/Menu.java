@@ -1,13 +1,14 @@
 package Logic.Menu;
 
 
+import Utils.FileManager;
 import org.json.simple.JSONObject;
 
-import java.util.LinkedHashMap;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Menu {
+public class Menu implements Serializable {
 
     /** Used for Displaying on FE**/
     private List<MenuProduct> menuProductList;
@@ -40,4 +41,5 @@ public class Menu {
         o.put("menuProductList", objects);
         return o;
     }
+
 }

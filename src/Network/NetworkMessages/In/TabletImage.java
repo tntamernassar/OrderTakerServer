@@ -22,12 +22,6 @@ public class TabletImage extends IncomingNetworkMessage {
         this.chunkNumber = chunkNumber;
     }
 
-
-    @Override
-    public JSONObject encode() {
-        return null;
-    }
-
     @Override
     public void visit(Waitress Waitress) {
         ImageManager.addChunk(Waitress.getRestaurant().getName(), name, base64, (int)chunks, (int)chunkNumber);

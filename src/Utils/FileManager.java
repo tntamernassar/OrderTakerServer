@@ -1,14 +1,19 @@
 package Utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileManager {
 
-    private final static String basePath = "/home/tamer/Desktop/OrderTaker/Memory";
+    private static String basePath;
+
+
+    public static void init(String _basePath){
+        basePath = _basePath;
+    }
 
     public static String getBasePath() {
         return basePath;
@@ -34,6 +39,17 @@ public class FileManager {
         }
     }
 
+    public static String readFile(String name){
+        try {
+            Path fileName = Path.of(basePath + "/" + name);
+            String s = Files.readString(fileName);
+            return s;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static boolean writeBytes(String path, byte[] bytes){
         try{
             FileOutputStream fileOutputStream = new FileOutputStream(path);
@@ -52,6 +68,38 @@ public class FileManager {
         }catch (Exception e){
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public synchronized static boolean writeObject(Serializable object, String filename){
+        try {
+            File file = new File(basePath + "/" + filename);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(object);
+            os.close();
+            fos.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Object readObject(String filename){
+        try {
+            File file = new File(basePath+ "/" + filename);
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            Object o =  is.readObject();
+            is.close();
+            fis.close();
+            return o;
+        } catch (Exception e) {
+            return null;
         }
     }
 

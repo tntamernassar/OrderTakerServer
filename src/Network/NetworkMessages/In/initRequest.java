@@ -4,7 +4,6 @@ package Network.NetworkMessages.In;
 import Logic.Menu.Menu;
 import Logic.Waitress;
 import Network.ConnectionHandler;
-import Network.NetworkMessages.Out.ServerImage;
 import Network.NetworkMessages.Out.initResponse;
 import Utils.ImageManager;
 import org.json.simple.JSONArray;
@@ -21,11 +20,6 @@ public class initRequest extends IncomingNetworkMessage {
     public initRequest(ConnectionHandler connectionHandler, String SerialNumber, JSONArray images) {
         super(connectionHandler, SerialNumber);
         this.tabletImages = (String[]) images.toArray(new String[0]);
-    }
-
-    @Override
-    public JSONObject encode() {
-        return null;
     }
 
     @Override
@@ -56,7 +50,6 @@ public class initRequest extends IncomingNetworkMessage {
                 ImageManager.sendImageInChucks(getConnectionHandler(), serverImage, base64);
             }
         }
-
 
     }
 }

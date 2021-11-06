@@ -4,8 +4,13 @@ import Logic.Menu.Menu;
 import Logic.Menu.MenuProduct;
 import Logic.Menu.MenuSection;
 import Logic.Restaurant;
+import Logic.Table;
 import Logic.Waitress;
+import Utils.FileManager;
 import Utils.RestaurantsManager;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.net.Socket;
 import java.util.LinkedList;
@@ -13,23 +18,67 @@ import java.util.LinkedList;
 public class OTServer {
 
     public static void main(String[] args){
-        System.out.println("OrderTaker Server Started");
-
-        Restaurant restaurant = new Restaurant("res1", makeDummyMenu());
-        Waitress waitress = new Waitress("res1Waitress", restaurant);
-
-        RestaurantsManager.getInstance().addWaitress("John", restaurant.getName(), waitress);
-
-        TCPHandler tcpHandler = new TCPHandler(2222) {
+        int port = Integer.parseInt(args[0]);
+        String basePath = args[1];
+        System.out.println("OrderTaker Server Started on port " + port);
+        FileManager.init(basePath);
+        initSystem();
+        KnownConnections knownConnections = new KnownConnections();
+        TCPHandler tcpHandler = new TCPHandler(port) {
             @Override
             public void onConnectionRequest(Socket socket) {
                 System.out.println("Connection accepted");
-                ConnectionHandler c = new ConnectionHandler(socket);
+                ConnectionHandler c = new ConnectionHandler(socket, knownConnections);
                 c.start();
             }
         };
 
         tcpHandler.start();
+    }
+
+    private static void initSystem(){
+        String s = FileManager.readFile("config");
+        JSONParser parser = new JSONParser();
+        RestaurantsManager restaurantsManager = RestaurantsManager.getInstance();
+        try{
+            JSONObject config = (JSONObject) parser.parse(s);
+            JSONArray restaurants = (JSONArray) config.get("restaurants");
+            for (int i = 0; i < restaurants.size(); i++){
+                String restaurantName = (String) restaurants.get(i);
+
+
+                JSONObject resConfig = (JSONObject) config.get(restaurantName);
+
+                String waitressName = (String) resConfig.get("waitressName");
+                JSONArray serialNumbers = (JSONArray) resConfig.get("serialNumbers");
+                JSONArray tables = (JSONArray) resConfig.get("tables");
+
+                Restaurant restaurant = new Restaurant(restaurantName, readMenu(restaurantName));
+                Waitress waitress = new Waitress(waitressName, restaurant);
+
+                for (int j = 0; j < tables.size(); j++){
+                    long table = (long) tables.get(j);
+                    restaurant.addTable(new Table((int)table));
+                }
+
+                for (int j = 0; j < serialNumbers.size(); j++){
+                    String serialNumber = (String) serialNumbers.get(j);
+                    restaurantsManager.addWaitress(serialNumber, restaurantName, waitress);
+                }
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static Menu readMenu(String restaurant){
+        Object o = FileManager.readObject(restaurant+"/menu");
+        if(o == null){
+            return makeDummyMenu();
+        }else{
+            return (Menu) o;
+        }
     }
 
     private static Menu makeDummyMenu(){

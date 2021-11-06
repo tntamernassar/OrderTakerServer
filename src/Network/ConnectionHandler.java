@@ -18,12 +18,15 @@ import java.net.SocketException;
 public class ConnectionHandler extends Thread {
 
     private Waitress waitress;
+    private String SerialNumber;
     protected Socket socket;
     private boolean running;
+    private KnownConnections knownConnections;
 
-    public ConnectionHandler(Socket socket) {
+    public ConnectionHandler(Socket socket, KnownConnections knownConnections) {
         this.socket = socket;
         this.running = true;
+        this.knownConnections = knownConnections;
     }
 
 
@@ -46,24 +49,30 @@ public class ConnectionHandler extends Thread {
             dos.writeUTF(msg);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
 
+    public void sendToOthers(OutGoingNetworkMessage outGoingNetworkMessage){
+        knownConnections.sendToAllBut(waitress.getRestaurant().getName(), SerialNumber, outGoingNetworkMessage);
+    }
+
     private void onMessage(IncomingNetworkMessage message) {
         if (this.waitress == null) {
+            this.SerialNumber = message.getSerialNumber();
             this.waitress = RestaurantsManager.getInstance().getWaitress(message.getSerialNumber());
+            this.knownConnections.addConnection(waitress.getRestaurant().getName(), SerialNumber, this);
         }
         message.visit(this.waitress);
     }
 
     @Override
     public void run() {
+        String message = "";
         try {
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
             while (this.running) {
-                String message = dataInputStream.readUTF();
+                message = dataInputStream.readUTF();
                 JSONParser p = new JSONParser();
                 JSONObject JSONMessage = (JSONObject) p.parse(message);
                 IncomingNetworkMessage networkMessage = (IncomingNetworkMessage) NetworkMessageDecoder.decode(this, JSONMessage);
@@ -73,11 +82,14 @@ public class ConnectionHandler extends Thread {
             System.out.println((waitress == null ? "Tablet" : waitress.getName()) + " Closed the connection");
             this.running = false;
         } catch (SocketException socketException) {
-            socketException.printStackTrace();
+            System.out.println((waitress == null ? "Tablet" : waitress.getName()) + " Closed the connection");
             this.running = false;
         } catch (Exception e) {
+            System.out.println("Error while parsing : " + message);
             e.printStackTrace();
         }
 
     }
+
+
 }

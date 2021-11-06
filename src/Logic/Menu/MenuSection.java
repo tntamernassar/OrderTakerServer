@@ -2,10 +2,11 @@ package Logic.Menu;
 
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MenuSection {
+public class MenuSection implements Serializable {
     private String section;
     private String[] addons;
     private boolean maxOne;

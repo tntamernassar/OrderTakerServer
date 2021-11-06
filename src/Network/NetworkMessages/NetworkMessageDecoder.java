@@ -2,6 +2,9 @@ package Network.NetworkMessages;
 
 import Network.ConnectionHandler;
 import Network.NetworkMessages.In.MenuEdit;
+import Network.NetworkMessages.In.Tables.CancelTable;
+import Network.NetworkMessages.In.Tables.CloseTable;
+import Network.NetworkMessages.In.Tables.OpenTable;
 import Network.NetworkMessages.In.TabletImage;
 import Network.NetworkMessages.In.initRequest;
 import org.json.simple.JSONArray;
@@ -16,19 +19,35 @@ public class NetworkMessageDecoder {
 
         if(type.equals("TestMessage")){
             return new TestMessage(connectionHandler, SerialNumber);
-        }else if(type.equals("initRequest")){
+        }
+
+        /** Menu related messages **/
+        else if(type.equals("initRequest")){
             JSONArray images = (JSONArray) JSONMessage.get("images");
             return new initRequest(connectionHandler, SerialNumber, images);
         }else if(type.equals("MenuEdit")){
             JSONObject menu = (JSONObject) JSONMessage.get("menu");
-            JSONArray images = (JSONArray) JSONMessage.get("images");
-            return new MenuEdit(connectionHandler, SerialNumber, menu, images);
+            JSONArray newImages = (JSONArray) JSONMessage.get("newImages");
+            JSONArray shouldDeleteImages = (JSONArray) JSONMessage.get("shouldDeleteImages");
+            return new MenuEdit(connectionHandler, SerialNumber, menu, newImages, shouldDeleteImages);
         }else if(type.equals("TabletImage")){
             String name = (String)JSONMessage.get("name");
             String base64 = (String)JSONMessage.get("base64");
             long chunks = (long)JSONMessage.get("chunks");
             long chunkNumber = (long)JSONMessage.get("chunkNumber");
             return new TabletImage(connectionHandler, SerialNumber, name, base64, chunks, chunkNumber);
+        }
+
+        /** Tables Related Messages **/
+        else if(type.equals("OpenTable")){
+            long table = (long)JSONMessage.get("table");
+            return new OpenTable(connectionHandler, SerialNumber, (int)table);
+        }else if(type.equals("CloseTable")){
+            long table = (long)JSONMessage.get("table");
+            return new CloseTable(connectionHandler, SerialNumber, (int)table);
+        }else if(type.equals("CancelTable")){
+            long table = (long)JSONMessage.get("table");
+            return new CancelTable(connectionHandler, SerialNumber, (int)table);
         }
 
         return null;

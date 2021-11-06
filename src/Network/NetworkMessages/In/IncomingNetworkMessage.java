@@ -24,7 +24,9 @@ public abstract class IncomingNetworkMessage extends NetworkMessage {
     }
 
     @Override
-    public abstract JSONObject encode();
+    public JSONObject encode() {
+        return null;
+    }
 
     public abstract void visit(Waitress waitress);
 }

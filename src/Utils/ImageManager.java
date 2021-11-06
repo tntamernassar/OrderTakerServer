@@ -23,7 +23,17 @@ public class ImageManager {
             String chunk = base64.substring(i * chunkSize, Math.min(i*chunkSize + chunkSize, base64.length()));
             connectionHandler.send(new ServerImage(name, chunk, chunksNeeded, chunkNumber));
         }
+    }
 
+    public static void sendImageInChucksToOthers(ConnectionHandler connectionHandler, String name, String base64){
+        int chunkSize = (int)Constants.TCP_CHUNK_LENGTH;
+        int chunksNeeded =  (int)Math.ceil(base64.length() / chunkSize);
+
+        for(int i = 0; i < chunksNeeded; i++){
+            int chunkNumber = i + 1;
+            String chunk = base64.substring(i * chunkSize, Math.min(i*chunkSize + chunkSize, base64.length()));
+            connectionHandler.sendToOthers(new ServerImage(name, chunk, chunksNeeded, chunkNumber));
+        }
     }
 
     public static void addChunk(String restaurantName, String fileName, String base64, int chunks, int chunkNumber){
@@ -49,7 +59,7 @@ public class ImageManager {
         return FileManager.listFiles(path);
     }
 
-    public static String readBase64(String restaurant, String name){
+    public static String readBase64(String restaurant, Object name){
         try {
             String image_path = FileManager.getBasePath() + "/" + restaurant + "/images/" + name;
             File file = new File(image_path);
@@ -69,8 +79,10 @@ public class ImageManager {
     }
 
     public static void deleteImage(String restaurant, String name){
-        String image_path = FileManager.getBasePath() + "/" + restaurant + "/images/" + name;
-        FileManager.deleteFile(image_path);
+        if(!name.equals(Constants.DEFAULT_IMAGE_NAME)){
+            String image_path = FileManager.getBasePath() + "/" + restaurant + "/images/" + name;
+            FileManager.deleteFile(image_path);
+        }
     }
 
 

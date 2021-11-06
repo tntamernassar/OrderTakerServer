@@ -1,31 +1,30 @@
 package Network.NetworkMessages.In;
 
-import Logic.Menu.Menu;
 import Logic.Menu.MenuProduct;
 import Logic.Menu.MenuSection;
 import Logic.Waitress;
 import Network.ConnectionHandler;
+import Network.NetworkMessages.Out.MenuEditNotification;
+import Utils.FileManager;
 import Utils.ImageManager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public class MenuEdit extends IncomingNetworkMessage{
 
     private JSONObject menu;
-    private JSONArray images;
+    private JSONArray newImagesArray;
+    private JSONArray shouldDeleteImagesArray;
 
-    public MenuEdit(ConnectionHandler connectionHandler, String SerialNumber, JSONObject menu, JSONArray images) {
+    public MenuEdit(ConnectionHandler connectionHandler, String SerialNumber, JSONObject menu, JSONArray newImagesArray, JSONArray shouldDeleteImagesArray) {
         super(connectionHandler, SerialNumber);
-        this.images = images;
         this.menu = menu;
-    }
-
-    @Override
-    public JSONObject encode() {
-        return null;
+        this.newImagesArray = newImagesArray;
+        this.shouldDeleteImagesArray = shouldDeleteImagesArray;
     }
 
 
@@ -86,31 +85,39 @@ public class MenuEdit extends IncomingNetworkMessage{
     @Override
     public void visit(Waitress waitress) {
         // delete unused images
-        String[] serverImages = ImageManager.listImages(waitress.getRestaurant().getName());
-        String[] clientImages = new String[images.size()];
+        List<String> newImages = new LinkedList<>();
+        List<String> shouldDelete = new LinkedList<>();
 
-
-        for (int i = 0; i < images.size(); i++){
-            clientImages[i] = (String) images.get(i);
+        for (int i=0;i<newImagesArray.size();i++){
+            newImages.add((String) newImagesArray.get(i));
+        }
+        for (int i=0;i<shouldDeleteImagesArray.size();i++){
+            shouldDelete.add((String) shouldDeleteImagesArray.get(i));
         }
 
         System.out.println("MenuEdit request from " + waitress.getName());
-        System.out.println("\t - Server images :" + Arrays.toString(serverImages));
-        System.out.println("\t - Tablet images :" + Arrays.toString(clientImages));
-
-
-        for (String serverImage: serverImages){
-            if (!Arrays.asList(clientImages).contains(serverImage)){
-                ImageManager.deleteImage(waitress.getRestaurant().getName(), serverImage);
-            }
-        }
-
+        System.out.println("\t - New images :" + Arrays.toString(newImages.toArray()));
+        System.out.println("\t - To Delete images :" + Arrays.toString(shouldDelete.toArray()));
 
         // update menu
         LinkedList<MenuProduct> clientMenuProducts = getMenuProducts();
         waitress.getRestaurant().getMenu().setMenuProductList(clientMenuProducts);
+
         // save to file
+        FileManager.writeObject(waitress.getRestaurant().getMenu(), waitress.getRestaurant().getName() + "/menu");
         System.out.println("\tUpdated Menu !");
+
         // notify connected tablets
+        for (String img: newImages){
+            String base64 = ImageManager.readBase64(waitress.getRestaurant().getName(), img);
+            ImageManager.sendImageInChucksToOthers(getConnectionHandler(), img, base64);
+        }
+        getConnectionHandler().sendToOthers(new MenuEditNotification(waitress.getRestaurant().getMenu(), newImages, shouldDelete));
+
+        // delete extra images
+        for (String serverImage: shouldDelete) {
+            ImageManager.deleteImage(waitress.getRestaurant().getName(), serverImage);
+        }
+
     }
 }

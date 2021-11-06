@@ -6,9 +6,10 @@ import Logic.Product;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class MenuProduct implements Product {
+public class MenuProduct implements Product, Serializable {
 
     private String category;
     private String name;

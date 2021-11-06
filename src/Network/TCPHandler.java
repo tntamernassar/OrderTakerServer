@@ -4,6 +4,7 @@ package Network;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 public abstract class TCPHandler extends Thread{
 
@@ -12,11 +13,16 @@ public abstract class TCPHandler extends Thread{
     private boolean running;
     private boolean connected;
 
+    private HashMap<String, HashMap<String, ConnectionHandler>> knownConnection;
+
     public TCPHandler(int port){
         this.port = port;
         this.connected = false;
         this.running = true;
+        knownConnection = new HashMap<>();
     }
+
+
 
 
     public Socket connect(InetAddress address){
@@ -61,7 +67,7 @@ public abstract class TCPHandler extends Thread{
         try{
             serverSocket.close();
         }catch (Exception e){
-            System.out.println("Error while CLosing TCPHandler socket ...");
+            System.out.println("Error while Closing TCPHandler socket ...");
         }
     }
 }
