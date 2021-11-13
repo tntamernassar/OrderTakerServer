@@ -1,10 +1,12 @@
 package Network.NetworkMessages;
 
 import Network.ConnectionHandler;
+import Network.NetworkMessages.In.GetOrderHistory;
 import Network.NetworkMessages.In.MenuEdit;
 import Network.NetworkMessages.In.Tables.CancelTable;
 import Network.NetworkMessages.In.Tables.CloseTable;
 import Network.NetworkMessages.In.Tables.OpenTable;
+import Network.NetworkMessages.In.Tables.SubmitTable;
 import Network.NetworkMessages.In.TabletImage;
 import Network.NetworkMessages.In.initRequest;
 import org.json.simple.JSONArray;
@@ -48,6 +50,11 @@ public class NetworkMessageDecoder {
         }else if(type.equals("CancelTable")){
             long table = (long)JSONMessage.get("table");
             return new CancelTable(connectionHandler, SerialNumber, (int)table);
+        }else if(type.equals("SubmitTable")){
+            JSONObject table = (JSONObject) JSONMessage.get("table");
+            return new SubmitTable(connectionHandler, SerialNumber, table);
+        }else if (type.equals("GetOrderHistory")){
+            return new GetOrderHistory(connectionHandler, SerialNumber);
         }
 
         return null;

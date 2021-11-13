@@ -1,6 +1,7 @@
 package Network.NetworkMessages.Out;
 
 import Logic.Menu.Menu;
+import Logic.Table;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -10,10 +11,12 @@ public class initResponse extends OutGoingNetworkMessage {
 
     private Menu menu;
     private LinkedList<String> serverImages;
+    private LinkedList<Table> tables;
 
-    public initResponse(Menu menu, LinkedList<String> serverImages){
+    public initResponse(Menu menu, LinkedList<String> serverImages, LinkedList<Table> tables){
         this.menu = menu;
         this.serverImages = serverImages;
+        this.tables = tables;
     }
 
     @Override
@@ -23,9 +26,15 @@ public class initResponse extends OutGoingNetworkMessage {
         JSONArray serverImagesJsonArray = new JSONArray();
         serverImagesJsonArray.addAll(serverImages);
 
+        JSONArray tablesJsonArray = new JSONArray();
+        for (Table table : tables){
+            tablesJsonArray.add(table.toJSON());
+        }
+
 
         result.put("menu", menuJSON);
         result.put("serverImages", serverImagesJsonArray);
+        result.put("tables", tablesJsonArray);
         return result;
     }
 

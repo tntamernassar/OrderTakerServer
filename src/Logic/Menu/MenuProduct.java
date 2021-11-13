@@ -26,7 +26,28 @@ public class MenuProduct implements Product, Serializable {
         this.price = price;
         this.sections = sections;
         this.images = images;
+    }
 
+    public MenuProduct(JSONObject menuProduct){
+        String category = (String) menuProduct.get("category");
+        String name = (String) menuProduct.get("name");
+        String description = (String) menuProduct.get("description");
+        JSONArray images = (JSONArray) menuProduct.get("images");
+        JSONArray sections = (JSONArray) menuProduct.get("sections");
+
+        this.images = new String[images.size()];
+        for(int i=0;i<images.size();i++){
+            this.images[i] = (String)images.get(i);
+        }
+
+        this.sections = new LinkedList<>();
+        for(int i=0;i<sections.size();i++){
+            this.sections.add(new MenuSection((JSONObject) sections.get(i)));
+        }
+
+        this.category = category;
+        this.name = name;
+        this.description = description;
     }
 
     public double getPrice() {

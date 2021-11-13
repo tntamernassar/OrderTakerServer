@@ -79,10 +79,10 @@ public class ConnectionHandler extends Thread {
                 this.onMessage(networkMessage);
             }
         } catch (EOFException eofException) {
-            System.out.println((waitress == null ? "Tablet" : waitress.getName()) + " Closed the connection");
+            System.out.println(SerialNumber == null ? "Tablet" : SerialNumber + " Closed the connection");
             this.running = false;
         } catch (SocketException socketException) {
-            System.out.println((waitress == null ? "Tablet" : waitress.getName()) + " Closed the connection");
+            System.out.println(SerialNumber == null ? "Tablet" : SerialNumber+ " Closed the connection");
             this.running = false;
         } catch (Exception e) {
             System.out.println("Error while parsing : " + message);

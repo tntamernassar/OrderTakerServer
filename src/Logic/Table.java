@@ -1,29 +1,49 @@
 package Logic;
 
 
-
+import Logic.Orders.Order;
+import Logic.Orders.OrderItem;
+import org.json.simple.JSONObject;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class Table implements Serializable {
 
     private int number;
     private boolean isActive;
     private Order currentOrder;
-    private String startedAt;
-    private String closedAt;
+
 
 
     public Table(int number){
         this.number = number;
         this.isActive = false;
         this.currentOrder = null;
+
     }
 
-    public Table(int number,int version){
-        this.number = number;
-        this.isActive = false;
-        this.currentOrder = null;
+    public Table(JSONObject table){
+        long number = (long)table.get("number");
+        boolean isActive = (boolean)table.get("isActive");
+        Order currentOrder = null;
+        if(table.containsKey("currentOrder")) {
+            currentOrder = new Order((JSONObject) table.get("currentOrder"));
+        }
+        this.number = (int)number;
+        this.isActive = isActive;
+
+        this.currentOrder = currentOrder;
+    }
+
+    public void setTable(Table table){
+        this.number = table.getNumber();
+        this.isActive = table.isActive();
+        this.currentOrder = table.getCurrentOrder();
+    }
+
+    public void mergeTable(Table table){
+        currentOrder.mergerOrder(table.getCurrentOrder());
     }
 
     public int getNumber() {
@@ -42,12 +62,9 @@ public class Table implements Serializable {
         return currentOrder;
     }
 
-    public String getStartedAt() {
-        return startedAt;
-    }
 
-    public String getClosedAt() {
-        return closedAt;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public Order startOrder(String startedBy){
@@ -62,6 +79,7 @@ public class Table implements Serializable {
 
     public Order closeOrder(){
         Order o = this.currentOrder;
+        o.setClosedAt(LocalDateTime.now());
         this.currentOrder = null;
         this.isActive = false;
         return o;
@@ -88,5 +106,18 @@ public class Table implements Serializable {
                 "isActive=" + isActive + ",\n\t" +
                 "currentOrder=" + currentOrder + "\n" +
                 "}";
+    }
+
+    public JSONObject toJSON(){
+        try {
+            JSONObject res = new JSONObject();
+            res.put("number", number);
+            res.put("isActive", isActive);
+            res.put("currentOrder", currentOrder != null ? currentOrder.toJSON() : null);
+            return res;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

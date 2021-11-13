@@ -3,6 +3,7 @@ package Network;
 import Logic.Menu.Menu;
 import Logic.Menu.MenuProduct;
 import Logic.Menu.MenuSection;
+import Logic.Orders.OrderHistory;
 import Logic.Restaurant;
 import Logic.Table;
 import Logic.Waitress;
@@ -46,14 +47,18 @@ public class OTServer {
             for (int i = 0; i < restaurants.size(); i++){
                 String restaurantName = (String) restaurants.get(i);
 
-
                 JSONObject resConfig = (JSONObject) config.get(restaurantName);
 
                 String waitressName = (String) resConfig.get("waitressName");
                 JSONArray serialNumbers = (JSONArray) resConfig.get("serialNumbers");
                 JSONArray tables = (JSONArray) resConfig.get("tables");
 
-                Restaurant restaurant = new Restaurant(restaurantName, readMenu(restaurantName));
+                OrderHistory orderHistory = readOrderHistory(restaurantName);
+                if (orderHistory == null){
+                    orderHistory = new OrderHistory(new LinkedList<>());
+                }
+                System.out.println(orderHistory.getOrders().size());
+                Restaurant restaurant = new Restaurant(restaurantName, readMenu(restaurantName), orderHistory);
                 Waitress waitress = new Waitress(waitressName, restaurant);
 
                 for (int j = 0; j < tables.size(); j++){
@@ -78,6 +83,15 @@ public class OTServer {
             return makeDummyMenu();
         }else{
             return (Menu) o;
+        }
+    }
+
+    private static OrderHistory readOrderHistory(String restaurant){
+        Object o = FileManager.readObject(restaurant+"/orders");
+        if(o == null){
+            return null;
+        }else{
+            return (OrderHistory) o;
         }
     }
 

@@ -2,6 +2,7 @@ package Network.NetworkMessages.In;
 
 
 import Logic.Menu.Menu;
+import Logic.Table;
 import Logic.Waitress;
 import Network.ConnectionHandler;
 import Network.NetworkMessages.Out.initResponse;
@@ -42,7 +43,8 @@ public class initRequest extends IncomingNetworkMessage {
             }
         }
 
-        this.getConnectionHandler().send(new initResponse(menu, serverImages));
+        LinkedList<Table> tables = new LinkedList<>(waitress.getRestaurant().getTableList());
+        this.getConnectionHandler().send(new initResponse(menu, serverImages, tables));
 
         for (String serverImage : clientMissingImages){
             String base64 = ImageManager.readBase64(waitress.getRestaurant().getName(), serverImage);
@@ -50,6 +52,7 @@ public class initRequest extends IncomingNetworkMessage {
                 ImageManager.sendImageInChucks(getConnectionHandler(), serverImage, base64);
             }
         }
+
 
     }
 }

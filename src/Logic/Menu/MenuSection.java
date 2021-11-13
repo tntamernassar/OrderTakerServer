@@ -1,10 +1,12 @@
 package Logic.Menu;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 public class MenuSection implements Serializable {
     private String section;
@@ -15,6 +17,21 @@ public class MenuSection implements Serializable {
         this.section = section;
         this.addons = addons;
         this.maxOne = maxOne;
+    }
+
+    public MenuSection(JSONObject menuSection){
+        String section = (String) menuSection.get("section");
+        boolean maxOne = (boolean) menuSection.get("maxOne");
+        JSONArray addons = (JSONArray) menuSection.get("addons");
+
+        this.addons = new String[addons.size()];
+        for(int i=0;i<addons.size();i++){
+            this.addons[i] = (String)addons.get(i);
+        }
+
+        this.section = section;
+        this.maxOne = maxOne;
+
     }
 
     public void setAddons(String[] addons) {
