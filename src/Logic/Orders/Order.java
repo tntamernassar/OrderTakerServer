@@ -72,6 +72,14 @@ public class Order implements Serializable {
         this.distributed = distributed;
     }
 
+    public void setDistributeVersion(Order distributeVersion) {
+        this.distributeVersion = distributeVersion;
+    }
+
+    public Order getDistributeVersion() {
+        return distributeVersion;
+    }
+
     public void setClosedAt(LocalDateTime closedAt) {
         this.closedAt = closedAt;
     }
