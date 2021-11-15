@@ -67,8 +67,8 @@ public class Table implements Serializable {
         isActive = active;
     }
 
-    public Order startOrder(String startedBy){
-        return this.startOrder(new Order(startedBy));
+    public Order startOrder(int table, String startedBy){
+        return this.startOrder(new Order(table, startedBy));
     }
 
     public Order startOrder(Order order){

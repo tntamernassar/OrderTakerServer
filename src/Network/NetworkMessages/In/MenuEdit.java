@@ -37,6 +37,7 @@ public class MenuEdit extends IncomingNetworkMessage{
 
                 String category, name, description;
                 double price;
+                boolean available;
                 String[] images = null;
                 LinkedList<MenuSection> menuSections = null;
 
@@ -44,7 +45,7 @@ public class MenuEdit extends IncomingNetworkMessage{
                 name = (String) menuProductJson.get("name");
                 description = (String) menuProductJson.get("description");
                 price = (long) menuProductJson.get("price");
-
+                available = (boolean) menuProductJson.get("available");
                 JSONArray imagesArray = (JSONArray) menuProductJson.get("images");
                 if (imagesArray.size() != 0){
                     images = new String[imagesArray.size()];
@@ -73,7 +74,7 @@ public class MenuEdit extends IncomingNetworkMessage{
                     }
                 }
 
-                menuProducts.add(new MenuProduct(category,name, description, price, menuSections, images));
+                menuProducts.add(new MenuProduct(category,name, description, price, available, menuSections, images));
             }
             return menuProducts;
         } catch (Exception e) {

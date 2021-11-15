@@ -15,15 +15,17 @@ public class MenuProduct implements Product, Serializable {
     private String name;
     private String description;
     private double price;
+    private boolean available;
     private String[] images;
     private LinkedList<MenuSection> sections;
 
 
-    public MenuProduct(String category, String name, String description, double price, LinkedList<MenuSection> sections, String[] images){
+    public MenuProduct(String category, String name, String description, double price, boolean available, LinkedList<MenuSection> sections, String[] images){
         this.category = category;
         this.name = name;
         this.description = description;
         this.price = price;
+        this.available = available;
         this.sections = sections;
         this.images = images;
     }
@@ -32,6 +34,8 @@ public class MenuProduct implements Product, Serializable {
         String category = (String) menuProduct.get("category");
         String name = (String) menuProduct.get("name");
         String description = (String) menuProduct.get("description");
+        long price = (long) menuProduct.get("price");
+        boolean available = (boolean) menuProduct.get("available");
         JSONArray images = (JSONArray) menuProduct.get("images");
         JSONArray sections = (JSONArray) menuProduct.get("sections");
 
@@ -48,6 +52,8 @@ public class MenuProduct implements Product, Serializable {
         this.category = category;
         this.name = name;
         this.description = description;
+        this.price = price;
+        this.available = available;
     }
 
     public double getPrice() {
@@ -88,6 +94,7 @@ public class MenuProduct implements Product, Serializable {
         o.put("name", name);
         o.put("description", description);
         o.put("price", price);
+        o.put("available", available);
         JSONArray objects = new JSONArray();
         if(sections != null) {
             for (MenuSection menuSection : sections) {

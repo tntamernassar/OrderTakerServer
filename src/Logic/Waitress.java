@@ -31,7 +31,7 @@ public class Waitress {
     public void openTable(int table){
         Table theTable = restaurant.getTable(table);
         if (!theTable.isActive()){
-            theTable.startOrder(getName());
+            theTable.startOrder(table, getName());
             System.out.println("Opened Table " + table);
         }else {
 
