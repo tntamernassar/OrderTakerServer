@@ -2,13 +2,19 @@ import Network.NetworkMessages.TestMessage;
 import org.json.simple.JSONObject;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TryThings {
 
     public static void main(String[] args){
 
-        generateString(10);
+//        generateString(10);
+
+        int i = ThreadLocalRandom.current().nextInt(0, 2);
+        System.out.println(i);
     }
+
+
 
     public static String generateString(int targetStringLength) {
         int leftLimit = 97; // letter 'a'

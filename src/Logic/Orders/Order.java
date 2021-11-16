@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Order implements Serializable {
@@ -21,7 +22,7 @@ public class Order implements Serializable {
     private String startedBy;
     private boolean distributed;
     private Order distributeVersion;
-    private HashMap<Integer, OrderItem> orderItems;
+    private ConcurrentHashMap<Integer, OrderItem> orderItems;
 
 
     public Order(int table, String startedBy){
@@ -30,12 +31,12 @@ public class Order implements Serializable {
         this.itemsCounter = new AtomicInteger(0);
         this.distributed = false;
         this.distributeVersion = null;
-        this.orderItems = new HashMap<>();
+        this.orderItems = new ConcurrentHashMap<>();
         this.startedAt = LocalDateTime.now();
     }
 
     public Order(JSONObject order){
-        this.orderItems = new HashMap<>();
+        this.orderItems = new ConcurrentHashMap<>();
 
         long table = (long)order.get("table");
         long itemsCounter = (long)order.get("itemsCounter");
@@ -95,7 +96,7 @@ public class Order implements Serializable {
     }
 
     public synchronized void mergerOrder(Order order){
-        HashMap<Integer, OrderItem> otherOrderItems = order.getOrderItems();
+        ConcurrentHashMap<Integer, OrderItem> otherOrderItems = order.getOrderItems();
 
         for (Integer index : otherOrderItems.keySet()){
             OrderItem otherOrderItem = otherOrderItems.get(index);
@@ -108,7 +109,7 @@ public class Order implements Serializable {
                 serverOrderItem.setQuantity(otherOrderItem.getQuantity());
                 serverOrderItem.setDistributed(otherOrderItem.isDistributed());
                 serverOrderItem.setNotes(otherOrderItem.getNotes());
-                serverOrderItem.setDeleted(otherOrderItem.isDeleted());
+                serverOrderItem.setDeleted(serverOrderItem.isDeleted() || otherOrderItem.isDeleted());
             }
         }
 
@@ -130,7 +131,7 @@ public class Order implements Serializable {
         return startedBy;
     }
 
-    public HashMap<Integer, OrderItem> getOrderItems() {
+    public ConcurrentHashMap<Integer, OrderItem> getOrderItems() {
         return orderItems;
     }
 

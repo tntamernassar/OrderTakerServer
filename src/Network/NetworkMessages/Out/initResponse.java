@@ -35,7 +35,6 @@ public class initResponse extends OutGoingNetworkMessage {
         result.put("menu", menuJSON);
         result.put("serverImages", serverImagesJsonArray);
         result.put("tables", tablesJsonArray);
-        System.out.println(tablesJsonArray.get(2).toString());
         return result;
     }
 
