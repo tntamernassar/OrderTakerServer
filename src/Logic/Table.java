@@ -32,7 +32,6 @@ public class Table implements Serializable {
         }
         this.number = (int)number;
         this.isActive = isActive;
-
         this.currentOrder = currentOrder;
     }
 

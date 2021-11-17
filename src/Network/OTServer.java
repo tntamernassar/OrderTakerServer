@@ -46,7 +46,8 @@ public class OTServer {
             JSONArray restaurants = (JSONArray) config.get("restaurants");
             for (int i = 0; i < restaurants.size(); i++){
                 String restaurantName = (String) restaurants.get(i);
-
+                FileManager.mkdir(restaurantName);
+                FileManager.mkdir(restaurantName + "/images");
                 JSONObject resConfig = (JSONObject) config.get(restaurantName);
 
                 String waitressName = (String) resConfig.get("waitressName");
@@ -79,7 +80,7 @@ public class OTServer {
     private static Menu readMenu(String restaurant){
         Object o = FileManager.readObject(restaurant+"/menu");
         if(o == null){
-            return makeDummyMenu();
+            return makeEmptyMenu();
         }else{
             return (Menu) o;
         }
@@ -94,7 +95,7 @@ public class OTServer {
         }
     }
 
-    private static Menu makeDummyMenu(){
+    private static Menu makeEmptyMenu(){
         Menu menu = new Menu(new LinkedList<>());
         LinkedList<MenuSection> sections_example_1 = new LinkedList<>();
         sections_example_1.add(new MenuSection("מידת עשייה", new String[]{"ميديوم", "ويل دان", "دان", "محروق"}, true));

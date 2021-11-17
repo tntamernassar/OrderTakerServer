@@ -23,9 +23,8 @@ public class SubmitTable extends IncomingNetworkMessage {
         Table serverTable = waitress.getRestaurant().getTable(clientTable.getNumber());
 
         System.out.println("Submitted table number " + clientTable.getNumber());
-        System.out.println("Order : " +  clientTable.getCurrentOrder().toJSON());
         if(serverTable.isActive()){
-            serverTable.getCurrentOrder().setDistributed(clientTable.getCurrentOrder().isDistributed());
+            serverTable.getCurrentOrder().setDistributed(serverTable.getCurrentOrder().isDistributed() || clientTable.getCurrentOrder().isDistributed());
             serverTable.getCurrentOrder().setDistributeVersion(clientTable.getCurrentOrder().getDistributeVersion());
             serverTable.mergeTable(clientTable);
         } else {

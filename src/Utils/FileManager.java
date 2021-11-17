@@ -19,6 +19,14 @@ public class FileManager {
         return basePath;
     }
 
+    public static void mkdir(String name){
+        File file = new File(getBasePath() + "/" + name);
+        if (!file.exists()){
+            file.mkdir();
+        }
+    }
+
+
     public static String[] listFiles(String path){
         File directory = new File(path);
         File[] files = directory.listFiles();
