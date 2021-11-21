@@ -1,14 +1,11 @@
 package Network.NetworkMessages;
 
 import Network.ConnectionHandler;
-import Network.NetworkMessages.In.GetOrderHistory;
-import Network.NetworkMessages.In.MenuEdit;
+import Network.NetworkMessages.In.*;
 import Network.NetworkMessages.In.Tables.CancelTable;
 import Network.NetworkMessages.In.Tables.CloseTable;
 import Network.NetworkMessages.In.Tables.OpenTable;
 import Network.NetworkMessages.In.Tables.SubmitTable;
-import Network.NetworkMessages.In.TabletImage;
-import Network.NetworkMessages.In.initRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,6 +18,8 @@ public class NetworkMessageDecoder {
 
         if(type.equals("TestMessage")){
             return new TestMessage(connectionHandler, SerialNumber);
+        }else if(type.equals("HealthMessage")){
+            return new HealthMessage(connectionHandler, SerialNumber);
         }
 
         /** Menu related messages **/
@@ -46,7 +45,8 @@ public class NetworkMessageDecoder {
             return new OpenTable(connectionHandler, SerialNumber, (int)table);
         }else if(type.equals("CloseTable")){
             long table = (long)JSONMessage.get("table");
-            return new CloseTable(connectionHandler, SerialNumber, (int)table);
+            long numberOfPeople = (long)JSONMessage.get("numberOfPeople");
+            return new CloseTable(connectionHandler, SerialNumber, (int)table, (int)numberOfPeople);
         }else if(type.equals("CancelTable")){
             long table = (long)JSONMessage.get("table");
             return new CancelTable(connectionHandler, SerialNumber, (int)table);

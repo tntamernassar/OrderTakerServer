@@ -17,7 +17,5 @@ public class TestMessage extends IncomingNetworkMessage {
     }
 
     @Override
-    public void visit(Waitress waitress) {
-        System.out.println("Waitress " + waitress.getName() + " sent a Test Message !");
-    }
+    public void visit(Waitress waitress) {}
 }

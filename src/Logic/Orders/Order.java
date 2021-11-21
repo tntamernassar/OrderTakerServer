@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Order implements Serializable {
 
     private int table;
+    private int numberOfPeople;
     private AtomicInteger itemsCounter;
     private LocalDateTime startedAt;
     private LocalDateTime closedAt;
@@ -33,6 +33,7 @@ public class Order implements Serializable {
         this.distributeVersion = null;
         this.orderItems = new ConcurrentHashMap<>();
         this.startedAt = LocalDateTime.now();
+        this.numberOfPeople = -1;
     }
 
     public Order(JSONObject order){
@@ -43,6 +44,8 @@ public class Order implements Serializable {
         String startedAt = (String)order.get("startedAt");
         String startedBy = (String)order.get("startedBy");
         boolean distributed = (boolean)order.get("distributed");
+        long numberOfPeople = (long)order.get("numberOfPeople");
+
         Order distributeVersion = null;
         if(order.containsKey("distributeVersion")) {
             distributeVersion = new Order((JSONObject) order.get("distributeVersion"));
@@ -63,6 +66,15 @@ public class Order implements Serializable {
         this.startedBy = startedBy;
         this.distributed = distributed;
         this.distributeVersion = distributeVersion;
+        this.numberOfPeople = (int)numberOfPeople;
+    }
+
+    public int getNumberOfPeople() {
+        return numberOfPeople;
+    }
+
+    public void setNumberOfPeople(int numberOfPeople) {
+        this.numberOfPeople = numberOfPeople;
     }
 
     public boolean isDistributed() {
@@ -112,19 +124,8 @@ public class Order implements Serializable {
                 serverOrderItem.setDeleted(serverOrderItem.isDeleted() || otherOrderItem.isDeleted());
             }
         }
+        setDistributeVersion(order.getDistributeVersion());
 
-        /**
-         * Check for items that is in the server but not in the order
-         * those items should be deleted
-         * */
-        for(Integer index : orderItems.keySet()){
-            OrderItem serverOrderItem = orderItems.get(index);
-            OrderItem otherOrderItem = order.getOrderItem(serverOrderItem);
-
-            if(otherOrderItem == null){ // this item is deleted
-                orderItems.remove(index);
-            }
-        }
     }
 
     public String getStartedBy() {
@@ -135,11 +136,18 @@ public class Order implements Serializable {
         return orderItems;
     }
 
-
     public int addItem(String waiterName, String timestamp, Product product, int quantity, String notes, boolean distributed, boolean deleted){
         int newItemIndex = itemsCounter.incrementAndGet();
         this.orderItems.put(newItemIndex, new OrderItem(newItemIndex, timestamp, waiterName, product, quantity, notes, distributed, deleted));
         return newItemIndex;
+    }
+
+    public void removeAllDeletedItems(){
+        for (Integer i : this.orderItems.keySet()){
+            if (this.orderItems.get(i).isDeleted()){
+                this.orderItems.remove(i);
+            }
+        }
     }
 
     public Order clone() {
@@ -161,6 +169,7 @@ public class Order implements Serializable {
             res.put("startedBy", startedBy);
             res.put("distributed", distributed);
             res.put("distributeVersion", distributeVersion != null ? distributeVersion.toJSON() : null);
+            res.put("numberOfPeople", numberOfPeople);
 
             JSONObject orderItemsObject = new JSONObject();
             JSONArray indexes = new JSONArray();

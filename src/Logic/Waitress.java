@@ -40,10 +40,12 @@ public class Waitress {
 
 
 
-    public Order closeOrder(int table){
+    public synchronized Order closeOrder(int table, int numberOfPeople){
         Table theTable = restaurant.getTable(table);
         if(theTable.isActive()){
             Order closedOrder = theTable.closeOrder();
+            closedOrder.setNumberOfPeople(numberOfPeople);
+            closedOrder.removeAllDeletedItems();
             restaurant.getOrderHistory().tryToAdd(closedOrder);
             boolean success = restaurant.getOrderHistory().write(restaurant.getName() + "/orders");
             if(!success){

@@ -20,16 +20,6 @@ public class OrderItem implements Serializable {
     private boolean deleted;
 
 
-    /** Main Constructor **/
-    public OrderItem(int index, String waiterName, Product product, int quantity, String notes, boolean deleted) {
-        this.index = index;
-        this.waiterName = waiterName;
-        this.product = product;
-        this.quantity = quantity;
-        this.notes = notes;
-        this.isDistributed = false;
-    }
-
 
     /** Copy Constructor **/
     public OrderItem(int index, String timestamp, String waiterName, Product product, int quantity, String notes, boolean isDistributed, boolean deleted) {
@@ -40,6 +30,7 @@ public class OrderItem implements Serializable {
         this.waiterName = waiterName;
         this.timestamp = timestamp;
         this.isDistributed = isDistributed;
+        this.deleted = deleted;
     }
 
     public OrderItem(JSONObject orderItem, Product product){
