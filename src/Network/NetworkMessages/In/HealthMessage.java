@@ -11,6 +11,5 @@ public class HealthMessage extends IncomingNetworkMessage{
     }
 
     @Override
-    public void visit(Waitress waitress) {
-    }
+    public void visit(Waitress waitress) {}
 }
